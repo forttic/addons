@@ -7,7 +7,11 @@ Each directory is a complete, independent root module with its own provider
 block. There is no shared state and no root module tying them together. That is
 deliberate: **you cannot run all twenty at once inside the free tier**.
 
-| Path | Contents |
+Everything lives under `Lab-Setup/AWS/` in the
+[forttic/addons](https://github.com/forttic/addons) repo. Paths below are
+relative to that folder.
+
+| Path (in `Lab-Setup/AWS/`) | Contents |
 |---|---|
 | `ec2/` | 10 EC2/EBS stacks (`ec2-01` … `ec2-09`, `ec2-backup-dr`) plus `up.sh` / `down.sh` |
 | `s3/` | 10 S3 stacks (`s3-01` … `s3-08`, `s3-backup-dr`, `s3-replication`) plus `up.sh` / `down.sh` |
@@ -15,6 +19,13 @@ deliberate: **you cannot run all twenty at once inside the free tier**.
 | `Forttic-Testcases.xlsx` | Test cases for the scanner |
 | `SLA/` | Sample backup and DR SLA documents |
 | `Report/` | Sample report templates |
+
+Get it:
+
+```bash
+git clone https://github.com/forttic/addons.git
+cd addons/Lab-Setup/AWS
+```
 
 Requirements: Terraform ≥ 1.5, AWS provider ~> 5.0, the AWS CLI, and bash (Git
 Bash on Windows) for `up.sh` / `down.sh` and for the stacks that run backup
@@ -130,10 +141,10 @@ created but nothing is backed up, and nothing reports an error.
 
 ## 4. Running them
 
-Deploy one stack:
+Deploy one stack (from the repo root):
 
 ```bash
-cd ec2/ec2-01
+cd Lab-Setup/AWS/ec2/ec2-01
 terraform init
 terraform apply
 terraform output cost_estimate
@@ -145,9 +156,10 @@ Tear it down:
 terraform destroy
 ```
 
-Or a whole group from its folder (`ec2/` or `s3/`):
+Or a whole group from its folder (`Lab-Setup/AWS/ec2/` or `Lab-Setup/AWS/s3/`):
 
 ```bash
+cd Lab-Setup/AWS/ec2
 ./up.sh                    # apply every stack in the folder
 ./up.sh ec2-01 ec2-05      # only the named stacks
 ./down.sh                  # destroy every stack (asks first; -y skips the prompt)
@@ -202,7 +214,7 @@ aws resourcegroupstaggingapi get-resources --tag-filters "Key=Fixture,Values=pos
 
 ## 7. What never goes in this repo
 
-`.gitignore` keeps out `terraform.tfstate*` (state can contain your account ID
+`Lab-Setup/AWS/.gitignore` keeps out `terraform.tfstate*` (state can contain your account ID
 and resource ARNs), `.terraform/` provider caches, `.terraform.lock.hcl` and
 `*.tfvars`. `terraform init` creates the lock file again on each machine, using
 the newest provider that matches `~> 5.0`.
